@@ -1,0 +1,16 @@
+function DOA=ss_music(X,Snap,position,N_alpha)
+Rx=X*X'/Snap;
+Tx=X*X.'/Snap;
+y=[Rx(:);   conj(Tx(:));   Tx(:);    conj(Rx(:)) ];
+D1=round(log(kron(exp(-position),exp(position))));
+D2=round(log(kron(exp(position),exp(-position))));
+Sn=round(log(kron(exp(-position),exp(-position))));
+Sp=round(log(kron(exp(position),exp(position))));
+pos_all=[ D1, Sn, Sp, D2 ]';
+[~,ind_sort]=unique(pos_all);
+ind_sort([1,2, end-1,end])=[];
+z=y(ind_sort);
+num= length(ind_sort)-N_alpha+1 ;
+Ri=smooth(z*z',num);
+Pm=music_linear(Ri,N_alpha,0.01);
+[DOA]=findmax_new([-90:0.01:90],Pm,N_alpha,1);
